@@ -25,6 +25,9 @@ RUN npm install
 # Generate prisma client
 RUN npx prisma generate
 
+# Build API
+RUN npm run build
+
 # Run and expose the server on port 5000
 EXPOSE 5000
 
