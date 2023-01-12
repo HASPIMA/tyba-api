@@ -14,3 +14,13 @@ describe('GET /api/v1', () => {
   });
 });
 
+describe('POST /api/v1/sign-up', () => {
+  it('should fail if no user info provided', (done) => {
+    request(app)
+      .post('/api/v1/sign-up')
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(400, done);
+  });
+});
+
