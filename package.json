@@ -4,6 +4,7 @@
   "description": "",
   "main": "src/index.ts",
   "scripts": {
+    "prestart": "npx prisma migrate deploy || true",
     "start": "ts-node src/index.ts",
     "start:dev": "node dist/src/index.js",
     "start-inspect": "node --inspect dist/src/index.js",
