@@ -20,7 +20,10 @@ describe('POST /api/v1/sign-up', () => {
       .post('/api/v1/sign-up')
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
-      .expect(400, done);
+      .expect(400, {
+        data: null,
+        errors: [{ message: 'Invalid user information has been provided' }],
+      }, done);
   });
 });
 
