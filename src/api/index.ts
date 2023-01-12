@@ -11,4 +11,8 @@ router.get<{}, MessageResponse>('/', (req, res) => {
 });
 
 
+router.post<{}, any>('/sign-up', (req, res) => {
+  return res.status(400).json({});
+});
+
 export default router;
