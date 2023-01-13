@@ -17,7 +17,9 @@
     "clean-start-inspect": "npm run clean && npm run build && npm run start-inspect",
     "build": "tsc",
     "lint": "eslint --fix src test",
-    "test": "jest"
+    "test": "jest",
+    "pretest:docker": "npm ic && npm run prestart",
+    "test:docker": "npm test"
   },
   "keywords": [],
   "author": "Harrison Pinto",
