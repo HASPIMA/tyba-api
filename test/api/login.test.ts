@@ -46,6 +46,6 @@ describe('POST /api/v1/login', () => {
 
     // Emails should match
     expect(login.body).toHaveProperty('data.email');
-    expect(login.body).toBe(signUp.body.data.email);
+    expect(login.body.data.email).toBe(signUp.body.data.email);
   });
 });
