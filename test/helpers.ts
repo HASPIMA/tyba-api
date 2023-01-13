@@ -1,7 +1,8 @@
 import { faker } from '@faker-js/faker';
 
 export const generateMockUser = () => ({
-  email: faker.internet.email(),
+  // Hacky code to force unique emails
+  email: (new Date().getTime() + '') + faker.internet.email(),
   name: faker.name.fullName(),
   password: faker.internet.password(),
 });
