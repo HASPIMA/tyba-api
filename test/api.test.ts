@@ -2,20 +2,8 @@ import request from 'supertest';
 
 import app from '../src/app';
 
-import { faker } from '@faker-js/faker';
-
 import DataResponse from '../src/interfaces/DataResponse';
-
-const generateMockUser = () => ({
-  email: faker.internet.email(),
-  name: faker.name.fullName(),
-  password: faker.internet.password(),
-});
-
-const validJWT = (token: string) => {
-  const jwtRegex = /^([\w=]+)\.([\w=]+)\.([\w\-\+\/=]*)/;
-  return jwtRegex.test(token);
-};
+import { generateMockUser, validJWT } from './helpers';
 
 describe('GET /api/v1', () => {
   it('responds with a json message', (done) => {
@@ -35,10 +23,14 @@ describe('POST /api/v1/sign-up', () => {
       .post('/api/v1/sign-up')
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
-      .expect(400, {
-        data: null,
-        errors: [{ message: 'Invalid user information has been provided' }],
-      }, done);
+      .expect(
+        400,
+        {
+          data: null,
+          errors: [{ message: 'Invalid user information has been provided' }],
+        },
+        done,
+      );
   });
 
   it('should create an user if info is provided', (done) => {
@@ -53,7 +45,7 @@ describe('POST /api/v1/sign-up', () => {
   it('should not allow a single email to be in several accounts', async () => {
     const userInfo = generateMockUser();
 
-    const response =  await request(app)
+    const response = await request(app)
       .post('/api/v1/sign-up')
       .set('Accept', 'application/json')
       .send(userInfo);
@@ -61,7 +53,7 @@ describe('POST /api/v1/sign-up', () => {
     expect(response.status).toEqual(201);
     expect(response.body.data.email).toEqual(userInfo.email);
 
-    const response2 =  await request(app)
+    const response2 = await request(app)
       .post('/api/v1/sign-up')
       .set('Accept', 'application/json')
       .send(userInfo);
@@ -71,9 +63,7 @@ describe('POST /api/v1/sign-up', () => {
     expect(response2.body.errors).toHaveLength(1);
   });
 
-
-
-  it('should hash user\'s password', (done) => {
+  it("should hash user's password", (done) => {
     const userInfo = generateMockUser();
 
     request(app)
@@ -111,8 +101,9 @@ describe('POST /api/v1/sign-up', () => {
           return done(err);
         }
 
-        const { data: { token } } = res.body as DataResponse;
-
+        const {
+          data: { token },
+        } = res.body as DataResponse;
 
         if (typeof token !== 'string') {
           return done('Token should be provided to the user');
