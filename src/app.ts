@@ -3,7 +3,7 @@ import morgan from 'morgan';
 import helmet from 'helmet';
 import cors from 'cors';
 
-import * as middlewares from './middlewares';
+import * as middlewares from './middlewares/handlers.middleware';
 import api from './routes';
 import MessageResponse from './interfaces/MessageResponse';
 
