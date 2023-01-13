@@ -2,8 +2,8 @@ import express from 'express';
 
 import MessageResponse from '../interfaces/MessageResponse';
 
-import signUp from './sign-up';
-import login from './login';
+import signUp from './sign-up.routes';
+import login from './login.routes';
 
 const router = express.Router();
 
