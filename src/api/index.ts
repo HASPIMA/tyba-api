@@ -3,7 +3,8 @@ import express from 'express';
 import DataResponse from '../interfaces/DataResponse';
 import MessageResponse from '../interfaces/MessageResponse';
 
-import { Prisma } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
+const prisma = new PrismaClient();
 
 const router = express.Router();
 
@@ -13,7 +14,7 @@ router.get<{}, MessageResponse>('/', (req, res) => {
   });
 });
 
-router.post<{}, DataResponse>('/sign-up', (req, res) => {
+router.post<{}, DataResponse>('/sign-up', async (req, res) => {
   const response: DataResponse = { data: null, errors: [] };
   const { email, name, password } = req.body as Prisma.UserCreateInput;
 
@@ -26,7 +27,14 @@ router.post<{}, DataResponse>('/sign-up', (req, res) => {
     return res.status(400).json(response);
   }
 
-  //TODO: Create user
+  // TODO: hash password
+  const user = await prisma.user.create({
+    data: { email, name, password },
+  });
+
+  response.data = user;
+
+  return res.status(201).json(response);
 });
 
 export default router;
