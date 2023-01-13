@@ -82,4 +82,25 @@ describe('POST /api/v1/login', () => {
 
     expect(login.statusCode).toBe(401);
   });
+
+  it('should fail when provided with wrong email and password', async () => {
+    const userInfo = generateMockUser();
+
+    // Create user in db
+    const signUp = await request(app)
+      .post(endpointSignUp)
+      .send(userInfo);
+
+    expect(signUp.statusCode).toBe(201);
+    expect(signUp.body).toHaveProperty('data.email');
+
+    // Try to login
+    const login = await request(app)
+      .post(endpointLogin)
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .send({ email:  `-${userInfo.email}`, password: `${userInfo.password}.` });
+
+    expect(login.statusCode).toBe(401);
+  });
 });
