@@ -3,7 +3,7 @@ import request from 'supertest';
 import app from '../../src/app';
 
 import DataResponse from '../../src/interfaces/DataResponse';
-import { generateMockUser, validJWT } from '../helpers';
+import { generateMockUser, isValidJWT } from '../helpers';
 
 describe('POST /api/v1/sign-up', () => {
   it('should fail if no user info provided', (done) => {
@@ -97,7 +97,7 @@ describe('POST /api/v1/sign-up', () => {
           return done('Token should be provided to the user');
         }
 
-        if (!validJWT(token)) {
+        if (!isValidJWT(token)) {
           return done('Invalid token was provided');
         }
 
