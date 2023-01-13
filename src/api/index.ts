@@ -3,6 +3,7 @@ import express from 'express';
 import DataResponse from '../interfaces/DataResponse';
 import MessageResponse from '../interfaces/MessageResponse';
 
+import bcrypt from 'bcrypt';
 import { Prisma, PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
@@ -16,7 +17,7 @@ router.get<{}, MessageResponse>('/', (req, res) => {
 
 router.post<{}, DataResponse>('/sign-up', async (req, res) => {
   const response: DataResponse = { data: null, errors: [] };
-  const { email, name, password } = req.body as Prisma.UserCreateInput;
+  let { email, name, password } = req.body as Prisma.UserCreateInput;
 
   if (
     typeof email !== 'string' ||
@@ -27,7 +28,10 @@ router.post<{}, DataResponse>('/sign-up', async (req, res) => {
     return res.status(400).json(response);
   }
 
-  // TODO: hash password
+  // hash password
+  const salt = await bcrypt.genSalt();
+  password = await bcrypt.hash(password, salt);
+
   const user = await prisma.user.create({
     data: { email, name, password },
   });
