@@ -50,6 +50,29 @@ describe('POST /api/v1/sign-up', () => {
       .expect(201, done);
   });
 
+  it('should not allow a single email to be in several accounts', async () => {
+    const userInfo = generateMockUser();
+
+    const response =  await request(app)
+      .post('/api/v1/sign-up')
+      .set('Accept', 'application/json')
+      .send(userInfo);
+
+    expect(response.status).toEqual(201);
+    expect(response.body.data.email).toEqual(userInfo.email);
+
+    const response2 =  await request(app)
+      .post('/api/v1/sign-up')
+      .set('Accept', 'application/json')
+      .send(userInfo);
+
+    expect(response2.status).toEqual(500);
+    expect(response2.body.data).toBeNull();
+    expect(response2.body.errors).toHaveLength(1);
+  });
+
+
+
   it('should hash user\'s password', (done) => {
     const userInfo = generateMockUser();
 
