@@ -2,6 +2,8 @@ import request from 'supertest';
 
 import app from '../src/app';
 
+import { faker } from '@faker-js/faker';
+
 describe('GET /api/v1', () => {
   it('responds with a json message', (done) => {
     request(app)
@@ -24,6 +26,18 @@ describe('POST /api/v1/sign-up', () => {
         data: null,
         errors: [{ message: 'Invalid user information has been provided' }],
       }, done);
+  });
+
+  it('should create an user if info is provided', (done) => {
+    const userInfo = { email: faker.internet.email(),
+      name: faker.name.fullName(),
+      password: faker.internet.password(),
+    };
+
+    request(app)
+      .post('/api/v1/sign-up')
+      .send(userInfo)
+      .expect(201, done);
   });
 });
 
