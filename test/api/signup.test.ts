@@ -1,21 +1,9 @@
 import request from 'supertest';
 
-import app from '../src/app';
+import app from '../../src/app';
 
-import DataResponse from '../src/interfaces/DataResponse';
-import { generateMockUser, validJWT } from './helpers';
-
-describe('GET /api/v1', () => {
-  it('responds with a json message', (done) => {
-    request(app)
-      .get('/api/v1')
-      .set('Accept', 'application/json')
-      .expect('Content-Type', /json/)
-      .expect(200, {
-        message: 'API - 👋🌎🌍🌏',
-      }, done);
-  });
-});
+import DataResponse from '../../src/interfaces/DataResponse';
+import { generateMockUser, validJWT } from '../helpers';
 
 describe('POST /api/v1/sign-up', () => {
   it('should fail if no user info provided', (done) => {
