@@ -6,6 +6,17 @@ import { faker } from '@faker-js/faker';
 
 import DataResponse from '../src/interfaces/DataResponse';
 
+const generateMockUser = () => ({
+  email: faker.internet.email(),
+  name: faker.name.fullName(),
+  password: faker.internet.password(),
+});
+
+const validJWT = (token: string) => {
+  const jwtRegex = /^([\w=]+)\.([\w=]+)\.([\w\-\+\/=]*)/;
+  return jwtRegex.test(token);
+};
+
 describe('GET /api/v1', () => {
   it('responds with a json message', (done) => {
     request(app)
@@ -31,11 +42,7 @@ describe('POST /api/v1/sign-up', () => {
   });
 
   it('should create an user if info is provided', (done) => {
-    const userInfo = {
-      email: faker.internet.email(),
-      name: faker.name.fullName(),
-      password: faker.internet.password(),
-    };
+    const userInfo = generateMockUser();
 
     request(app)
       .post('/api/v1/sign-up')
@@ -44,11 +51,7 @@ describe('POST /api/v1/sign-up', () => {
   });
 
   it('should hash user\'s password', (done) => {
-    const userInfo = {
-      email: faker.internet.email(),
-      name: faker.name.fullName(),
-      password: faker.internet.password(),
-    };
+    const userInfo = generateMockUser();
 
     request(app)
       .post('/api/v1/sign-up')
@@ -65,6 +68,35 @@ describe('POST /api/v1/sign-up', () => {
 
         if (data.password === userInfo.password) {
           return done('Password should not be stored in plain text');
+        }
+
+        return done();
+      });
+  });
+
+  it('should provide a valid JWT', (done) => {
+    const userInfo = generateMockUser();
+
+    request(app)
+      .post('/api/v1/sign-up')
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .send(userInfo)
+      .expect(201)
+      .end((err, res) => {
+        if (err) {
+          return done(err);
+        }
+
+        const { data: { token } } = res.body as DataResponse;
+
+
+        if (typeof token !== 'string') {
+          return done('Token should be provided to the user');
+        }
+
+        if (!validJWT(token)) {
+          return done('Invalid token was provided');
         }
 
         return done();
