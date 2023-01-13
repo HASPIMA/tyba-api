@@ -53,6 +53,13 @@ router.post<{}, DataResponse>('/', async (req, res, next) => {
     return res.status(401).json(response);
   }
 
+  const passwordsMatch = await bcrypt.compare(password, user.password);
+
+  if (!passwordsMatch) {
+    response.errors.push(badCredentials);
+    return res.status(401).json(response);
+  }
+
   const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET as string, {
     expiresIn: process.env.USER_TOKEN_EXPIRATION_TIME as string,
   });
