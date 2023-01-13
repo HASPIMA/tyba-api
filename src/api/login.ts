@@ -1,8 +1,13 @@
 import express from 'express';
 
 import DataResponse from '../interfaces/DataResponse';
+import ErrorResponse from '../interfaces/ErrorResponse';
+
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 import { PrismaClient, type User } from '@prisma/client';
+import { exclude } from '../helpers/exclude';
 const prisma = new PrismaClient();
 
 const router = express.Router();
@@ -36,15 +41,27 @@ router.post<{}, DataResponse>('/', async (req, res, next) => {
     return next(response.errors[0]);
   }
 
-  if (
-    typeof email !== 'string' ||
-    typeof password !== 'string'
-  ) {
-    response.errors.push({ message: 'Invalid user information has been provided' });
+  // We do not reveal which of these two is incorrect to
+  //  prevent information leakage
+  const badCredentials: ErrorResponse = {
+    message: 'Check your email or password',
+  };
+
+
+  if (user === null) {
+    response.errors.push(badCredentials);
     return res.status(400).json(response);
   }
 
-  return res.status(500).json(response);
+  const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET as string, {
+    expiresIn: process.env.USER_TOKEN_EXPIRATION_TIME as string,
+  });
+
+  const userWithoutPassword = exclude(user, ['password']);
+
+  response.data = { ...userWithoutPassword, token };
+
+  return res.status(200).json(response);
 });
 
 export default router;
