@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import DataResponse from '../interfaces/DataResponse';
 
-const verifyToken = (req: Request, res: Response<DataResponse>, next: NextFunction) => {
+export const verifyToken = (req: Request, res: Response<DataResponse>, next: NextFunction) => {
   const token = req.headers.authorization;
 
   const response: DataResponse = {
