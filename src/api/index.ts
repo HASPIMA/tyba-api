@@ -4,6 +4,8 @@ import DataResponse from '../interfaces/DataResponse';
 import MessageResponse from '../interfaces/MessageResponse';
 
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+
 import { Prisma, PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
@@ -36,7 +38,11 @@ router.post<{}, DataResponse>('/sign-up', async (req, res) => {
     data: { email, name, password },
   });
 
-  response.data = user;
+  const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET as string, {
+    expiresIn: process.env.USER_TOKEN_EXPIRATION_TIME as string,
+  });
+
+  response.data = { ...user, token };
 
   return res.status(201).json(response);
 });
