@@ -50,7 +50,7 @@ router.post<{}, DataResponse>('/', async (req, res, next) => {
 
   if (user === null) {
     response.errors.push(badCredentials);
-    return res.status(400).json(response);
+    return res.status(401).json(response);
   }
 
   const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET as string, {
