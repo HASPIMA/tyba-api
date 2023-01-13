@@ -12,7 +12,7 @@ const router = express.Router();
 
 router.post<{}, DataResponse>('/', async (req, res, next) => {
   const response: DataResponse = { data: null, errors: [] };
-  let { email, name, password } = req.body as Prisma.UserCreateInput;
+  let { email, name, password } = req.body as Prisma.UserCreateManyInput;
 
   if (
     typeof email !== 'string' ||
@@ -28,7 +28,7 @@ router.post<{}, DataResponse>('/', async (req, res, next) => {
   password = await bcrypt.hash(password, salt);
 
   const user = await prisma.user.create({
-    data: { email, name, password },
+    data: { email: email.trim(), name: name.trim(), password },
   }).catch( e => {
     console.error('Unexpected error creating user', e);
 
