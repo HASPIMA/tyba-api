@@ -17,3 +17,8 @@ jobs:
       POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD}}
       POSTGRES_DB: ${{ secrets.POSTGRES_DB}}
       DATABASE_URL: ${{ secrets.DATABASE_URL}}
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Create .env file
+        run: env > .env
