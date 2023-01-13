@@ -29,17 +29,11 @@
 			"type": "node-terminal"
 		},
 		{
-			"type": "node",
-			"request": "launch",
 			"name": "Run API",
-			"skipFiles": [
-				"<node_internals>/**"
-			],
-			"program": "${workspaceFolder}/dist/index.js",
-			"outFiles": [
-				"${workspaceFolder}/**/*.js"
-			],
-			"preLaunchTask": "Run: clean-build",
+			"command": "npm start",
+			"request": "launch",
+			"preLaunchTask": "npm: clean-build",
+			"type": "node-terminal",
 		}
 	]
 }
