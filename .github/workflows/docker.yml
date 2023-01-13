@@ -24,3 +24,5 @@ jobs:
         run: env > .env
       - name: Build the services
         run: docker compose --env-file .env build --tag tyba-api:$(date +%s)
+      - name: Test API
+        run: docker compose run --rm api npm run test:docker
