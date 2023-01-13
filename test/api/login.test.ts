@@ -5,6 +5,7 @@ import { generateMockUser, jwtRegex } from '../helpers';
 
 describe('POST /api/v1/login', () => {
   const endpointLogin = '/api/v1/login';
+  const endpointSignUp = '/api/v1/sign-up';
 
   it('should fail if no credentials are provided', (done) => {
     request(app)
@@ -26,7 +27,7 @@ describe('POST /api/v1/login', () => {
 
     // Create user in db
     const signUp = await request(app)
-      .post('/api/v1/sign-up')
+      .post(endpointSignUp)
       .send(userInfo);
 
     expect(signUp.statusCode).toBe(201);
@@ -47,5 +48,17 @@ describe('POST /api/v1/login', () => {
     // Emails should match
     expect(login.body).toHaveProperty('data.email');
     expect(login.body.data.email).toBe(signUp.body.data.email);
+  });
+
+  it('should fail when provided with an inexistent user', async () => {
+    const userInfo = generateMockUser();
+
+    const login = await request(app)
+      .post(endpointLogin)
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .send({ email: userInfo.email, password: userInfo.password });
+
+    expect(login.statusCode).toBe(401);
   });
 });
