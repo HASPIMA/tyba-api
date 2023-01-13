@@ -1,0 +1,19 @@
+name: Docker Image CI
+
+on:
+  push:
+  pull_request:
+    branches: ["master", "develop"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      TRIPADVISOR_API_KEY: ${{ secrets.TRIPADVISOR_API_KEY}}
+      JWT_SECRET: ${{ secrets.JWT_SECRET}}
+      USER_TOKEN_EXPIRATION_TIME: ${{ vars.USER_TOKEN_EXPIRATION_TIME}}
+      POSTGRES_USER: ${{ secrets.POSTGRES_USER}}
+      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD}}
+      POSTGRES_DB: ${{ secrets.POSTGRES_DB}}
+      DATABASE_URL: ${{ secrets.DATABASE_URL}}
