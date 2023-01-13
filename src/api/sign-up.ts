@@ -10,9 +10,9 @@ const prisma = new PrismaClient();
 
 const router = express.Router();
 
-router.post<{}, DataResponse>('/', async (req, res) => {
+router.post<{}, DataResponse>('/', async (req, res, next) => {
   const response: DataResponse = { data: null, errors: [] };
-  let { email, name, password } = req.body as Prisma.UserCreateInput;
+  let { email, name, password } = req.body as Prisma.UserCreateManyInput;
 
   if (
     typeof email !== 'string' ||
@@ -28,9 +28,18 @@ router.post<{}, DataResponse>('/', async (req, res) => {
   password = await bcrypt.hash(password, salt);
 
   const user = await prisma.user.create({
-    data: { email, name, password },
+    data: { email: email.trim(), name: name.trim(), password },
+  }).catch( e => {
+    console.error('Unexpected error creating user', e);
+
+    response.errors.push({ message: 'Unexpected error creating user', stack: e });
+    res.statusCode = 500;
+    return null;
   });
 
+  if (user === null) {
+    return next(response.errors[0]);
+  }
   // Create to be bearer token
   const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET as string, {
     expiresIn: process.env.USER_TOKEN_EXPIRATION_TIME as string,
