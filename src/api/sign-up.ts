@@ -23,7 +23,7 @@ router.post<{}, DataResponse>('/', async (req, res) => {
     return res.status(400).json(response);
   }
 
-  // hash password
+  // Hash password
   const salt = await bcrypt.genSalt();
   password = await bcrypt.hash(password, salt);
 
@@ -31,6 +31,7 @@ router.post<{}, DataResponse>('/', async (req, res) => {
     data: { email, name, password },
   });
 
+  // Create to be bearer token
   const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET as string, {
     expiresIn: process.env.USER_TOKEN_EXPIRATION_TIME as string,
   });
