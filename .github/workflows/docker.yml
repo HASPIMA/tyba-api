@@ -22,3 +22,5 @@ jobs:
       - uses: actions/checkout@v3
       - name: Create .env file
         run: env > .env
+      - name: Build the services
+        run: docker compose --env-file .env build --tag tyba-api:$(date +%s)
