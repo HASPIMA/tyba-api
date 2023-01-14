@@ -1,9 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 
-import jwt from 'jsonwebtoken';
+import jwt, { JsonWebTokenError } from 'jsonwebtoken';
 import DataResponse from '../interfaces/DataResponse';
 
 export const verifyToken = (req: Request, res: Response<DataResponse>, next: NextFunction) => {
+  const regex = /^Bearer (.+)$/;
   const token = req.headers.authorization;
 
   const response: DataResponse = {
@@ -16,16 +17,27 @@ export const verifyToken = (req: Request, res: Response<DataResponse>, next: Nex
     return res.status(401).json(response);
   }
   try {
+
+    const match = regex.exec(token);
+
+    if (match === null) {
+      throw new JsonWebTokenError('Invalid Bearer token');
+    }
+
+    const bearer = match[1];
+
     // Decode JWT and store it over `res.locals.decoded`
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string);
+    const decoded = jwt.verify( bearer, process.env.JWT_SECRET as string);
     res.locals.decoded = decoded;
 
     // TODO: Verify token is not blacklisted
 
     next();
   } catch (err) {
-    response.errors.push({ message: 'Invalid token', stack: err as any });
+    console.log('Invalid token:', token);
+    console.error(err);
+    response.errors.push({ message: `Invalid token: ${token}` });
 
-    return next(response.errors[0]);
+    return res.status(401).json(response);
   }
 };

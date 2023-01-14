@@ -4,7 +4,7 @@ import app from '../../src/app';
 import { endpoints } from './constants';
 
 describe(`GET ${endpoints.nearbySearch}`, () => {
-  it('should require a user to be logged in', (done) => {
+  it('should require a jwt to be provided', (done) => {
     request(app)
       .get(endpoints.nearbySearch)
       .set('Accept', 'application/json')
