@@ -7,7 +7,7 @@ export const generateMockUser = () => ({
   password: faker.internet.password(),
 });
 
-export const jwtRegex = /^([\w=]+)\.([\w=]+)\.([\w\-\+\/=]*)/;
+export const jwtRegex = /^([\w=]+)\.([\w=]+)\.([\w\-\+\/=]*)$/;
 
 export const isValidJWT = (token: string) => {
   return jwtRegex.test(token);
