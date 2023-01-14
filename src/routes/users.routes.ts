@@ -43,7 +43,7 @@ router
   }).catch( error => {
     if (axios.isAxiosError(error)) {
       statusCode = error.status || 400;
-      response.errors.push(error.response?.data);
+      response.errors.push(error.response?.data?.error);
 
     } else {
       console.error('Unexpected error was thrown', error);
