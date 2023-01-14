@@ -2,14 +2,12 @@ import request from 'supertest';
 
 import app from '../../src/app';
 import { generateMockUser, jwtRegex } from '../helpers';
+import { endpoints } from './constants';
 
 describe('POST /api/v1/login', () => {
-  const endpointLogin = '/api/v1/login';
-  const endpointSignUp = '/api/v1/sign-up';
-
   it('should fail if no credentials are provided', (done) => {
     request(app)
-      .post(endpointLogin)
+      .post(endpoints.login)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(
@@ -27,7 +25,7 @@ describe('POST /api/v1/login', () => {
 
     // Create user in db
     const signUp = await request(app)
-      .post(endpointSignUp)
+      .post(endpoints.signUp)
       .send(userInfo);
 
     expect(signUp.statusCode).toBe(201);
@@ -35,7 +33,7 @@ describe('POST /api/v1/login', () => {
 
     // Login with same credentials
     const login = await request(app)
-      .post(endpointLogin)
+      .post(endpoints.login)
       .set('Accept', 'application/json')
       .send({ email: userInfo.email, password: userInfo.password });
 
@@ -54,7 +52,7 @@ describe('POST /api/v1/login', () => {
     const userInfo = generateMockUser();
 
     const login = await request(app)
-      .post(endpointLogin)
+      .post(endpoints.login)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .send({ email: userInfo.email, password: userInfo.password });
@@ -67,7 +65,7 @@ describe('POST /api/v1/login', () => {
 
     // Create user in db
     const signUp = await request(app)
-      .post(endpointSignUp)
+      .post(endpoints.signUp)
       .send(userInfo);
 
     expect(signUp.statusCode).toBe(201);
@@ -75,7 +73,7 @@ describe('POST /api/v1/login', () => {
 
     // Try to login
     const login = await request(app)
-      .post(endpointLogin)
+      .post(endpoints.login)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .send({ email: userInfo.email, password: `${userInfo.password}.` });
@@ -88,7 +86,7 @@ describe('POST /api/v1/login', () => {
 
     // Create user in db
     const signUp = await request(app)
-      .post(endpointSignUp)
+      .post(endpoints.signUp)
       .send(userInfo);
 
     expect(signUp.statusCode).toBe(201);
@@ -96,7 +94,7 @@ describe('POST /api/v1/login', () => {
 
     // Try to login
     const login = await request(app)
-      .post(endpointLogin)
+      .post(endpoints.login)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .send({ email:  `-${userInfo.email}`, password: `${userInfo.password}.` });
