@@ -30,7 +30,7 @@ router
   // We don't need user information at this point so we ignore it
 
   // Assume endpoint will work
-  res.statusCode = 200;
+  let statusCode = 200;
 
   // Call trip advisor's API
   const apiEndpoint = 'https://api.content.tripadvisor.com/api/v1/location/nearby_search';
@@ -42,13 +42,13 @@ router
     },
   }).catch( error => {
     if (axios.isAxiosError(error)) {
-      res.statusCode = error.status as number;
+      statusCode = error.status || 400;
       response.errors.push(error.response?.data);
 
     } else {
       console.error('Unexpected error was thrown', error);
 
-      res.statusCode = 500;
+      statusCode = 500;
       response.errors.push({ message: 'Unexpected error was thrown' });
     }
 
@@ -56,12 +56,12 @@ router
   });
 
   if (restaurants === null) {
-    return res.json(response);
+    return res.status(statusCode).json(response);
   }
 
   response.data = restaurants.data?.data;
 
-  return res.json(response);
+  return res.status(statusCode).json(response);
 });
 
 export default router;
