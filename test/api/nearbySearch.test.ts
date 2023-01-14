@@ -72,6 +72,25 @@ describe(`GET ${endpoints.nearbySearch}`, () => {
     expect(resBody.errors).toHaveLength(0);
 
     expect(nearbyRestaurants.statusCode).toBe(200);
+  });
 
+  it('should fail when given wrong coordinates', async () => {
+    // Get some restaurants
+    const nearbyRestaurants = await request(app)
+      .get(endpoints.nearbySearch)
+      .auth(token, { type: 'bearer' })
+      .set('Accept', 'application/json')
+      .query({ latLong: 'incorrect' + latLong })
+      .expect('Content-Type', /json/);
+
+    const resBody = nearbyRestaurants.body;
+
+    expect(resBody).toHaveProperty('data');
+    expect(resBody.data).toBeNull();
+
+    expect(resBody).toHaveProperty('errors');
+    expect(resBody.errors).toHaveLength(1);
+
+    expect(nearbyRestaurants.statusCode).toBe(400);
   });
 });
