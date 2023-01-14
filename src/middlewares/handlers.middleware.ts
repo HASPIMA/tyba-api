@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 
-import DataResponse from './interfaces/DataResponse';
+import DataResponse from '../interfaces/DataResponse';
 
 export function notFound(req: Request, res: Response, next: NextFunction) {
   res.status(404);
