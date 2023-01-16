@@ -22,9 +22,7 @@ const client = createClient({ url: process.env.REDIS_CONNECTION_STRING });
 client.on('error', (err) => console.log('Redis Client Error', err));
 
 async function connectToRedis() {
-  console.log('Connecting to Redis');
   await client.connect();
-  console.log('Connected to Redis\n');
 }
 
 connectToRedis();
@@ -41,10 +39,15 @@ app.get<{}, MessageResponse>('/', (req, res) => {
   });
 });
 
+
+app.get<{}, MessageResponse>('/ping', async (_, res) => {
+  const ping = await client.ping();
+  return res.json({ message: ping });
+});
+
 app.use('/api/v1', api);
 
 app.use(middlewares.notFound);
 app.use(middlewares.errorHandler);
 
-export const redisClient = client;
 export default app;
