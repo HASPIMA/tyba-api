@@ -7,6 +7,7 @@ import { getCurrentUserInfo } from '../middlewares/userInfo.middleware';
 
 import { type User } from '@prisma/client';
 import { type JwtPayload } from 'jsonwebtoken';
+import { type RedisClientType } from 'redis';
 
 const router = express.Router();
 
@@ -69,11 +70,37 @@ router
 
 router
   .route('/logout')
-  .post<Request, DataResponse>(async (req, res) => {
+  .post<Request, DataResponse>(async (_req, res) => {
   const response: DataResponse = { data: null, errors: [] };
+  let statusCode = 200;
 
-  response.data = 'User logged out';
+  const user = res.locals.user as User;
+  const token = res.locals.bearerToken as string;
+  const decodedToken = res.locals.decoded as JwtPayload;
 
-  return res.status(200).json(response);
+  const redisClient = res.locals.redisClient as RedisClientType;
+
+  try {
+    // Add token to the blacklist for as long as the token is valid
+    //  This prevents invalid tokens to be used and only check for the ones
+    //  that are not expired
+    const blackList = await redisClient.set(token, user.id, { EXAT: decodedToken.exp });
+
+    if (blackList !== 'OK') {
+      statusCode = 500;
+      response.errors.push({ message: 'Could not logout' });
+    }
+  } catch (error) {
+    console.error({ error });
+
+    statusCode = 500;
+    response.errors.push({ message: 'Unexpected error happened' });
+  }
+
+  if (statusCode === 200) {
+    response.data = 'User logged out';
+  }
+
+  return res.status(statusCode).json(response);
 });
 export default router;

@@ -25,6 +25,7 @@ export const verifyToken = (req: Request, res: Response<DataResponse>, next: Nex
     }
 
     const bearer = match[1];
+    res.locals.bearerToken = bearer;
 
     // Decode JWT and store it over `res.locals.decoded`
     const decoded = jwt.verify( bearer, process.env.JWT_SECRET as string);
