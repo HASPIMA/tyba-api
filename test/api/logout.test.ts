@@ -49,4 +49,25 @@ describe(`POST ${endpoints.logout}`, () => {
     expect(logout.body.errors).toHaveLength(0);
   });
 
+  it('should fail to logout when token has been blacklisted', async () => {
+    const logout1 = await request(app)
+      .post(endpoints.logout)
+      .auth(userToken, { type: 'bearer' })
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(200);
+
+    // No errors
+    expect(logout1.body).toHaveProperty('errors');
+    expect(logout1.body.errors).toHaveLength(0);
+
+    const logout2 = await request(app)
+      .post(endpoints.logout)
+      .auth(userToken, { type: 'bearer' })
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/);
+
+    expect(logout2.statusCode).toBe(403);
+  });
+
 });
