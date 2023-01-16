@@ -21,5 +21,13 @@ services:
       - "5000:5000"
     restart: always
 
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis-data:/data
+    ports:
+      - 6379:6379
+
 volumes:
   postgres-data:
+  redis-data:
