@@ -17,12 +17,12 @@ services:
     build: .
     depends_on:
       - postgres
-      - redis
+      - blacklist
     ports:
       - "5000:5000"
     restart: always
 
-  redis:
+  blacklist:
     image: redis:7-alpine
     volumes:
       - redis-data:/data
