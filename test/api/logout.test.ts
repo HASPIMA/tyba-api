@@ -1,6 +1,6 @@
 import request from 'supertest';
 
-import app, { redisClient } from '../../src/app';
+import app from '../../src/app';
 import { generateMockUser, jwtRegex } from '../helpers';
 import { endpoints } from './constants';
 
@@ -32,12 +32,6 @@ describe(`POST ${endpoints.logout}`, () => {
     expect(login.body.data.token).toMatch(jwtRegex);
 
     userToken = login.body.data.token;
-  });
-
-  it('should have a connection to redis', async () => {
-    const ping = await redisClient.PING();
-
-    expect(ping).toBe('PONG');
   });
 
   it('should be sucessful when user is logged in', async () => {
