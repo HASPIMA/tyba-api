@@ -2,7 +2,7 @@ import express from 'express';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import cors from 'cors';
-import { createClient } from 'redis';
+import Redis from 'ioredis';
 
 import * as middlewares from './middlewares/handlers.middleware';
 import api from './routes';
@@ -18,14 +18,7 @@ app.use(cors());
 app.use(express.json());
 
 // Setup redis client
-const client = createClient({ url: process.env.REDIS_CONNECTION_STRING });
-client.on('error', (err) => console.log('Redis Client Error', err));
-
-async function connectToRedis() {
-  await client.connect();
-}
-
-connectToRedis();
+const client = new Redis(process.env.REDIS_CONNECTION_STRING as string);
 
 // Provide redis client to each request
 app.use(async (_req, res, next) => {

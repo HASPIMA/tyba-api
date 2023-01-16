@@ -7,7 +7,7 @@ import { getCurrentUserInfo } from '../middlewares/userInfo.middleware';
 
 import { type User } from '@prisma/client';
 import { type JwtPayload } from 'jsonwebtoken';
-import { type RedisClientType } from 'redis';
+import { type Redis } from 'ioredis';
 
 const router = express.Router();
 
@@ -78,13 +78,13 @@ router
   const token = res.locals.bearerToken as string;
   const decodedToken = res.locals.decoded as JwtPayload;
 
-  const redisClient = res.locals.redisClient as RedisClientType;
+  const redisClient = res.locals.redisClient as Redis;
 
   try {
     // Add token to the blacklist for as long as the token is valid
     //  This prevents invalid tokens to be used and only check for the ones
     //  that are not expired
-    const blackList = await redisClient.set(token, user.id, { EXAT: decodedToken.exp });
+    const blackList = await redisClient.set(token, user.id, 'EXAT', decodedToken.exp as number);
 
     if (blackList !== 'OK') {
       statusCode = 500;
