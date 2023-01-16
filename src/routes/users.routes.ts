@@ -5,6 +5,9 @@ import DataResponse from '../interfaces/DataResponse';
 import NearbySearchQuery from '../interfaces/NearbySeachQuery';
 import { getCurrentUserInfo } from '../middlewares/userInfo.middleware';
 
+import { type User } from '@prisma/client';
+import { type JwtPayload } from 'jsonwebtoken';
+
 const router = express.Router();
 
 // All routes refering to /**/users/* require getCurrentUserInfo middleware
@@ -64,4 +67,13 @@ router
   return res.status(statusCode).json(response);
 });
 
+router
+  .route('/logout')
+  .post<Request, DataResponse>(async (req, res) => {
+  const response: DataResponse = { data: null, errors: [] };
+
+  response.data = 'User logged out';
+
+  return res.status(200).json(response);
+});
 export default router;
