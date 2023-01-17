@@ -23,3 +23,15 @@ describe('GET /', () => {
       }, done);
   });
 });
+
+describe('GET /ping', () => {
+  it('should be able to connect to redis', (done) => {
+    request(app)
+      .get('/ping')
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(200, {
+        message: 'PONG',
+      }, done);
+  });
+});
