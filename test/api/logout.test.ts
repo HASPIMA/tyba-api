@@ -1,11 +1,12 @@
 import request from 'supertest';
 
+import { type Express } from 'express';
+
 import app from '../../src/app';
 import { generateMockUser, jwtRegex } from '../helpers';
 import { endpoints } from './constants';
 
 const userInfo = generateMockUser();
-let userToken: string;
 
 beforeAll(async () => {
   // Create new user in db
@@ -18,26 +19,25 @@ beforeAll(async () => {
   expect(signUp.body.data.token).toMatch(jwtRegex);
 });
 
+// Update user token for each test
+const login = async (_app: Express) => {
+  const loginRequest = await request(_app)
+    .post(endpoints.login)
+    .set('Accept', 'application/json')
+    .send({ email: userInfo.email, password: userInfo.password })
+    .expect(200);
+
+  expect(loginRequest.body).toHaveProperty('data.token');
+  expect(loginRequest.body.data.token).toMatch(jwtRegex);
+
+  return loginRequest.body.data.token;
+};
+
 describe(`POST ${endpoints.logout}`, () => {
-
-  // Update user token for each test
-  beforeEach(async () => {
-    const login = await request(app)
-      .post(endpoints.login)
-      .set('Accept', 'application/json')
-      .send({ email: userInfo.email, password: userInfo.password })
-      .expect(200);
-
-    expect(login.body).toHaveProperty('data.token');
-    expect(login.body.data.token).toMatch(jwtRegex);
-
-    userToken = login.body.data.token;
-  });
-
   it('should be sucessful when user is logged in', async () => {
     const logout = await request(app)
       .post(endpoints.logout)
-      .auth(userToken, { type: 'bearer' })
+      .auth(await login(app), { type: 'bearer' })
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/);
 
@@ -52,7 +52,7 @@ describe(`POST ${endpoints.logout}`, () => {
   it('should fail to logout when token has been blacklisted', async () => {
     const logout1 = await request(app)
       .post(endpoints.logout)
-      .auth(userToken, { type: 'bearer' })
+      .auth(await login(app), { type: 'bearer' })
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200);
@@ -63,7 +63,7 @@ describe(`POST ${endpoints.logout}`, () => {
 
     const logout2 = await request(app)
       .post(endpoints.logout)
-      .auth(userToken, { type: 'bearer' })
+      .auth(await login(app), { type: 'bearer' })
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/);
 
