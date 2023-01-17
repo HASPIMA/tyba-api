@@ -1,9 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
+import type Redis from 'ioredis';
 
 import jwt, { JsonWebTokenError } from 'jsonwebtoken';
 import DataResponse from '../interfaces/DataResponse';
 
-export const verifyToken = (req: Request, res: Response<DataResponse>, next: NextFunction) => {
+export const verifyToken = async (req: Request, res: Response<DataResponse>, next: NextFunction) => {
   const regex = /^Bearer (.+)$/;
   const token = req.headers.authorization;
 
@@ -25,12 +26,21 @@ export const verifyToken = (req: Request, res: Response<DataResponse>, next: Nex
     }
 
     const bearer = match[1];
+    res.locals.bearerToken = bearer;
 
     // Decode JWT and store it over `res.locals.decoded`
     const decoded = jwt.verify( bearer, process.env.JWT_SECRET as string);
     res.locals.decoded = decoded;
 
-    // TODO: Verify token is not blacklisted
+    // Verify token is not blacklisted
+    const redisClient = res.locals.redisClient as Redis;
+
+    const blacklisted = await redisClient.get(bearer);
+
+    if (blacklisted !== null) {
+      response.errors.push({ message: 'Invalid session, please login again' });
+      return res.status(403).json(response);
+    }
 
     next();
   } catch (err) {

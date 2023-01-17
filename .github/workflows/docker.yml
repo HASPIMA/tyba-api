@@ -17,6 +17,7 @@ jobs:
       POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD}}
       POSTGRES_DB: ${{ secrets.POSTGRES_DB}}
       DATABASE_URL: ${{ secrets.DATABASE_URL}}
+      REDIS_CONNECTION_STRING: ${{ secrets.REDIS_CONNECTION_STRING}}
 
     steps:
       - uses: actions/checkout@v3

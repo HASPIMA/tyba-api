@@ -24,7 +24,7 @@ services. Once you've done that, you can run the following command:
   ```
 
 The option `--rm` allows this command to automatically remove the
-container when it exist, i.e: when the test run finished.
+container when it exits, i.e: when the test run finished.
 
 ### Running API
 
