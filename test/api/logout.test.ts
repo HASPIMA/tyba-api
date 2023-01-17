@@ -2,6 +2,8 @@ import request from 'supertest';
 
 import { type Express } from 'express';
 
+import timersPromises from 'timers/promises';
+
 import app from '../../src/app';
 import { generateMockUser, jwtRegex } from '../helpers';
 import { endpoints } from './constants';
@@ -21,6 +23,8 @@ beforeAll(async () => {
 
 // Update user token for each test
 const login = async (_app: Express) => {
+  await timersPromises.setTimeout(500, null);
+
   const loginRequest = await request(_app)
     .post(endpoints.login)
     .set('Accept', 'application/json')
@@ -35,9 +39,11 @@ const login = async (_app: Express) => {
 
 describe(`POST ${endpoints.logout}`, () => {
   it('should be sucessful when user is logged in', async () => {
+    const token = await login(app);
+
     const logout = await request(app)
       .post(endpoints.logout)
-      .auth(await login(app), { type: 'bearer' })
+      .auth(token, { type: 'bearer' })
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/);
 
@@ -50,9 +56,11 @@ describe(`POST ${endpoints.logout}`, () => {
   });
 
   it('should fail to logout when token has been blacklisted', async () => {
+    const token = await login(app);
+
     const logout1 = await request(app)
       .post(endpoints.logout)
-      .auth(await login(app), { type: 'bearer' })
+      .auth(token, { type: 'bearer' })
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200);
@@ -63,7 +71,7 @@ describe(`POST ${endpoints.logout}`, () => {
 
     const logout2 = await request(app)
       .post(endpoints.logout)
-      .auth(await login(app), { type: 'bearer' })
+      .auth(token, { type: 'bearer' })
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/);
 
